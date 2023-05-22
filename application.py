@@ -14,7 +14,8 @@ from datetime import datetime
 
 import tensorflow_hub as hub
 
-app = Flask(__name__)
+application = Flask(__name__)
+app = application
 url = 'http://localhost:5000'
 
 @app.route('/')
