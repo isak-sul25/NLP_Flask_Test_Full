@@ -1,0 +1,4 @@
+*.psd filter=lfs diff=lfs merge=lfs -text
+E:/NLP_Flask_Test_Full/Best_SmallBert filter=lfs diff=lfs merge=lfs -text
+E:/NLP_Flask_Test_Full/Best_SmallBert/variables/variables.data-00000-of-00001 filter=lfs diff=lfs merge=lfs -text
+Best_SmallBert/variables/variables.data-00000-of-00001 filter=lfs diff=lfs merge=lfs -text

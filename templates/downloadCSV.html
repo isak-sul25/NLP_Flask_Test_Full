@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Download Requests</title>
+</head>
+<body>
+    <h1>Download Requests</h1>
+    <button onclick="downloadCSV()">Download CSV</button>
+
+    <script>
+        function downloadCSV() {
+            // Create a temporary anchor element
+            var link = document.createElement('a');
+            link.style.display = 'none';
+            document.body.appendChild(link);
+
+            // Set the anchor's attributes
+            link.setAttribute('href', '/download');
+            link.setAttribute('download', 'requests.csv');
+
+            // Trigger a click event on the anchor element
+            link.click();
+
+            // Clean up the temporary anchor element
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+
+
+
+
+
+
+
+
+
+
+
+</html>

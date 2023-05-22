@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot UI</title>
+    <style>
+        #container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #chatbox {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        #userinput {
+            width: 100%;
+        }
+        #submitbtn {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Chatbot UI</h1>
+        <div id="chatbox"></div>
+        <input type="text" id="userinput" placeholder="Type your message...">
+        <button id="submitbtn">Send</button>
+    </div>
+    <script>
+        // JavaScript code to handle the chatbot UI interactions
+        var chatbox = document.getElementById('chatbox');
+        var userinput = document.getElementById('userinput');
+        var submitbtn = document.getElementById('submitbtn');
+
+        function appendMessage(message) {
+            var p = document.createElement('p');
+            p.innerText = message;
+            chatbox.appendChild(p);
+        }
+
+        function sendMessage() {
+            var inputText = userinput.value.trim();
+            if (inputText !== '') {
+                var message = 'You: ' + inputText;
+                appendMessage(message);
+                
+                // Send user input to the Flask chatbot route
+                var payload = {
+                    'input': inputText
+                };
+
+                fetch('/chatbot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    var response = data['response'];
+                    var botMessage = 'Chatbot: ' + response;
+                    appendMessage(botMessage);
+                })
+                .catch(function(error) {
+                    console.log('Error occurred:', error);
+                });
+
+                // Clear the user input field
+                userinput.value = '';
+            }
+        }
+
+        submitbtn.addEventListener('click', sendMessage);
+        userinput.addEventListener('keydown', function(event) {
+            if (event.keyCode === 13) { // Enter key
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

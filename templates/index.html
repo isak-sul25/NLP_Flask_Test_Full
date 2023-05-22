@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot UI</title>
+    <style>
+        body {
+            background-color: #f1f1f1;
+            font-family: Arial, sans-serif;
+        }
+
+        #container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #chatbox {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        #userinput {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #submitbtn {
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        p {
+            margin: 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Chatbot UI</h1>
+        <div id="chatbox"></div>
+        <input type="text" id="userinput" placeholder="Type your message...">
+        <button id="submitbtn">Send</button>
+    </div>
+    <button onclick="downloadCSV()">Download CSV</button>
+    <script>
+        // JavaScript code to handle the chatbot UI interactions
+        var chatbox = document.getElementById('chatbox');
+        var userinput = document.getElementById('userinput');
+        var submitbtn = document.getElementById('submitbtn');
+
+        function appendMessage(message, isUser) {
+            var p = document.createElement('p');
+            p.innerText = message;
+            if (isUser) {
+                p.style.textAlign = 'right';
+                p.style.color = '#4CAF50';
+            } else {
+                p.style.textAlign = 'left';
+                p.style.color = '#333';
+            }
+            chatbox.appendChild(p);
+        }
+
+        function sendMessage() {
+            var inputText = userinput.value.trim();
+            if (inputText !== '') {
+                var userMessage = 'You: ' + inputText;
+                appendMessage(userMessage, true);
+                
+                // Send user input to the Flask chatbot route
+                var payload = {
+                    'input': inputText
+                };
+
+                fetch('/chatbot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    var response = data['response'];
+                    var botMessage = 'Chatbot: ' + response;
+                    appendMessage(botMessage, false);
+                })
+                .catch(function(error) {
+                    console.log('Error occurred:', error);
+                });
+
+                // Clear the user input field
+                userinput.value = '';
+            }
+        }
+
+        submitbtn.addEventListener('click', sendMessage);
+        userinput.addEventListener('keydown', function(event) {
+            if (event.keyCode === 13) { // Enter key
+                sendMessage();
+            }
+        });
+
+        function downloadCSV() {
+        // Create a temporary anchor element
+        var link = document.createElement('a');
+        link.style.display = 'none';
+        document.body.appendChild(link);
+
+        // Set the anchor's attributes
+        link.setAttribute('href', '/download');
+        link.setAttribute('download', 'requests.csv');
+
+        // Trigger a click event on the anchor element
+        link.click();
+
+        // Clean up the temporary anchor element
+        document.body.removeChild(link);
+    }
+
+
+    </script>
+</body>
+</html>
+
+
+
