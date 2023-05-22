@@ -1,34 +1,98 @@
-from flask import Flask
+from flask import Flask, request, jsonify, render_template, send_file
+import requests
+import csv
+import tensorflow as tf
+import numpy as np
+from datetime import datetime
+import tensorflow_text
 
-# print a nice greeting.
-def say_hello(username = "World"):
-    return '<p>Hello %s!</p>\n' % username
-
-# some bits of text for the page.
-header_text = '''
-    <html>\n<head> <title>EB Flask Test</title> </head>\n<body>'''
-instructions = '''
-    <p><em>Hint</em>: This is a RESTful web service! Append a username
-    to the URL (for example: <code>/Thelonious</code>) to say hello to
-    someone specific.</p>\n'''
-home_link = '<p><a href="/">Back</a></p>\n'
-footer_text = '</body>\n</html>'
-
-# EB looks for an 'application' callable by default.
 application = Flask(__name__)
+app = application
+url = 'http://localhost:5000'
 
-# add a rule for the index page.
-application.add_url_rule('/', 'index', (lambda: header_text +
-    say_hello() + instructions + footer_text))
 
-# add a rule when the page is accessed with a name appended to the site
-# URL.
-application.add_url_rule('/<username>', 'hello', (lambda username:
-    header_text + say_hello(username) + home_link + footer_text))
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-# run the app.
-if __name__ == "__main__":
-    # Setting debug to True enables debug output. This line should be
-    # removed before deploying a production app.
-    application.debug = True
-    application.run()
+
+@app.route('/chatbot', methods=['POST'])
+def chatbot():
+    data = request.get_json()
+    user_input = data.get('input', '')
+
+    # Call the sentiment analysis route to get the chatbot response
+    payload = {'text': user_input}
+    response = requests.post(url + '/sentiment', json=payload)
+
+    if response.status_code == 200:
+        data = response.json()
+        sentiment = data['sentiment']
+        chatbot_response = get_chatbot_response(sentiment)
+    else:
+        chatbot_response = "Oops! Something went wrong."
+
+    return jsonify({'response': chatbot_response})
+
+
+def get_chatbot_response(sentiment):
+    # Customize the chatbot responses based on sentiment
+    return "The senitement is: " + str(sentiment)
+
+
+LABELS = ['admiration', 'approval', 'annoyance', 'gratitude', 'disapproval', 'amusement', 'curiosity', 'love',
+          'optimism', 'disappointment', 'joy', 'realization', 'anger']
+
+reloaded_model = tf.saved_model.load("Best_SmallBert")
+
+
+def save_to_csv(text, prediction):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    data = [[timestamp, text, prediction]]
+
+    with open('requests.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(data)
+
+
+def predict_line(inp):
+    output = reloaded_model(tf.constant([str(inp)]))
+    predictions = np.argmax(output, axis=-1)
+    predicted_label = LABELS[predictions[0]]
+    return predicted_label
+
+
+@app.route('/sentiment', methods=['POST'])
+def analyze_sentiment():
+    data = request.get_json()
+    text = data.get('text', '')
+    text = str(text)
+    prediction = predict_line(text)
+
+    save_to_csv(text, prediction)
+
+    response = {
+        'sentiment': prediction
+    }
+    return jsonify(response)
+
+
+@app.route('/all_requests', methods=['GET'])
+def get_all_requests():
+    with open('requests.csv', 'r') as file:
+        reader = csv.reader(file)
+        data = list(reader)
+
+    response = {
+        'requests': data
+    }
+    return jsonify(response)
+
+
+@app.route('/download')
+def download():
+    return send_file('requests.csv', as_attachment=True)
+
+
+if __name__ == '__main__':
+    app.run(threaded=True)
