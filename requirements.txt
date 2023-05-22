@@ -1,5 +1,4 @@
 Flask
 tensorflow
-tensorflow-text
 requests
 numpy
