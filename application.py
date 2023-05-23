@@ -9,6 +9,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipe
 application = Flask(__name__)
 app = application
 url = 'http://localhost:5000'
+
 tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 model = AutoModelForSequenceClassification.from_pretrained("isak-sul25/goo-model")
 classifier = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
