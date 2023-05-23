@@ -5,6 +5,7 @@ import torch
 from datetime import datetime
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
 
+# app
 application = Flask(__name__)
 app = application
 url = 'http://localhost:5000'
