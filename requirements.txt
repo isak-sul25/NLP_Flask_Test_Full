@@ -1,5 +1,5 @@
 Flask
+torch
 requests
 transformers
 pandas
-torch
