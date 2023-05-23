@@ -3,3 +3,4 @@ tensorflow
 tensorflow-text
 requests
 numpy
+transformers

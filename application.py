@@ -5,6 +5,7 @@ import tensorflow as tf
 import numpy as np
 from datetime import datetime
 import tensorflow_text
+from transformers import AutoTokenizer, TFAutoModelForMaskedLM
 
 application = Flask(__name__)
 app = application
@@ -43,7 +44,9 @@ def get_chatbot_response(sentiment):
 LABELS = ['admiration', 'approval', 'annoyance', 'gratitude', 'disapproval', 'amusement', 'curiosity', 'love',
           'optimism', 'disappointment', 'joy', 'realization', 'anger']
 
-reloaded_model = tf.saved_model.load("Best_SmallBert")
+# reloaded_model = tf.saved_model.load("Best_SmallBert")
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+reloaded_model = TFAutoModelForMaskedLM.from_pretrained("bert-base-uncased")
 
 
 def save_to_csv(text, prediction):
