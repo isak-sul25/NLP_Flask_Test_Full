@@ -1,8 +1,17 @@
 from flask import Flask
 import torch
 import model
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import pipeline
 
-model.train_model()
+distilbert_tokenizer2 = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+model = AutoModelForSequenceClassification.from_pretrained("isak-sul25/goo-model")
+
+model = model.to('cpu')
+classifier = pipeline("sentiment-analysis", model=model, tokenizer=distilbert_tokenizer2)
+ans = classifier("i am anger")
+
+print(ans)
 
 # print a nice greeting.
 def say_hello(username = "World"):
