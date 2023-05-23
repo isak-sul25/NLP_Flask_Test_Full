@@ -8,3 +8,4 @@ torch
 pandas
 scikit-learn
 accelerate
+urllib3==1.26.6
