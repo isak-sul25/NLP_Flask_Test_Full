@@ -12,9 +12,11 @@ tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 model = AutoModelForSequenceClassification.from_pretrained("isak-sul25/goo-model")
 classifier = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
 
-
 @app.route('/')
 def index():
+    global url
+    url = request.base_url
+    print(url)
     return render_template('index.html')
 
 
@@ -25,6 +27,7 @@ def chatbot():
 
     # Call the sentiment analysis route to get the chatbot response
     payload = {'text': user_input}
+    print(url)
     response = requests.post(url + '/sentiment', json=payload)
 
     if response.status_code == 200:
