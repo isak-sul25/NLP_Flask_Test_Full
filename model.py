@@ -1,7 +1,5 @@
 import pandas as pd
 import numpy as np
-import datasets
-from sklearn.preprocessing import MultiLabelBinarizer
 import random
 import torch
 from datasets import Dataset, DatasetDict, load_dataset
@@ -9,6 +7,10 @@ from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_sc
 from transformers import AutoTokenizer, TrainingArguments, Trainer, EvalPrediction, AutoModelForSequenceClassification, \
     pipeline
 
+
+label_dic = {0: 'admiration', 1: 'amusement', 2: 'anger', 3: 'annoyance', 4: 'approval', 5: 'curiosity',
+             6: 'disappointment', 7: 'disapproval', 8: 'gratitude', 9: 'joy', 10: 'love', 11: 'optimism',
+             12: 'realization', 13: 'neutral'}
 
 def train_model():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -18,35 +20,7 @@ def train_model():
     random.seed(seed)
     np.random.seed(seed)
 
-    # Load dataset and remove unneeded labels
-    labels = {0, 1, 2, 3, 4, 7, 9, 10, 15, 17, 18, 20, 22, 27}
-    new_labels = {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 7: 5, 9: 6, 10: 7, 15: 8, 17: 9, 18: 10, 20: 11, 22: 12, 27: 13}
-
-    def has_labels(example):
-        return set(example['labels']).issubset(labels)
-
-    def map_labels(example):
-        example['labels'] = [new_labels[label] for label in example['labels']]
-        return example
-
-    orig_dataset = load_dataset("go_emotions")
-    dataset = orig_dataset.filter(has_labels)
-    dataset = dataset.map(map_labels)
-
-    # Split the 'labels' column into multiple columns for every label
-    combined = datasets.concatenate_datasets([dataset["train"], dataset["test"], dataset["validation"]])
-    df = combined.to_pandas()
-    orig_df = df
-
-    label_dic = {0: 'admiration', 1: 'amusement', 2: 'anger', 3: 'annoyance', 4: 'approval', 5: 'curiosity',
-                 6: 'disappointment', 7: 'disapproval', 8: 'gratitude', 9: 'joy', 10: 'love', 11: 'optimism',
-                 12: 'realization', 13: 'neutral'}
-
-    mlb = MultiLabelBinarizer()
-    tags = mlb.fit_transform(df['labels'])
-    df[mlb.classes_] = tags
-    df = df.rename(columns=label_dic)
-    df = df.drop('labels', axis=1)
+    df = pd.read_csv("data.csv")
 
     # Distribution of a df
     def distribution(datafr):
