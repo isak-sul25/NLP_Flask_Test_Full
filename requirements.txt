@@ -1,6 +1,12 @@
 Flask
-tensorflow
-tensorflow-text
 requests
 numpy
 transformers
+datasets
+accelerate
+sklearn
+torch
+pandas
+scikit-learn
+tensorflow
+accelerate
