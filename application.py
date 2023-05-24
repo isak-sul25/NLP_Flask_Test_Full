@@ -11,7 +11,7 @@ app = application
 url = 'http://localhost:5000'
 
 tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-## model = AutoModelForSequenceClassification.from_pretrained("isak-sul25/goo-model")
+##model = AutoModelForSequenceClassification.from_pretrained("isak-sul25/goo-model")
 model = AutoModelForSequenceClassification.from_pretrained("isak-sul25/NLP-go")
 
 classifier = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
@@ -45,7 +45,7 @@ def chatbot():
 
 def get_chatbot_response(sentiment):
     # Customize the chatbot responses based on sentiment
-    return "The senitement is: " + str(sentiment)
+    return "The sentiment is: " + str(sentiment)
 
 
 def save_to_csv(text, prediction):
