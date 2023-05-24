@@ -11,7 +11,9 @@ app = application
 url = 'http://localhost:5000'
 
 tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-model = AutoModelForSequenceClassification.from_pretrained("isak-sul25/goo-model")
+# model = AutoModelForSequenceClassification.from_pretrained("isak-sul25/goo-model")
+model = AutoModelForSequenceClassification.from_pretrained("isak-sul25/NLP-go")
+
 classifier = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
 
 
