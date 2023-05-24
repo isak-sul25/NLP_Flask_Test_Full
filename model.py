@@ -190,3 +190,8 @@ def train_model():
     classifier = pipeline("sentiment-analysis", model=model, tokenizer=distilbert_tokenizer2)
 
     return classifier
+
+## 5e-5
+## DistiliBert
+## 64
+## 128 max_lenght for tokenizer
